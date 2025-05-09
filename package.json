@@ -1,19 +1,26 @@
 {
-  "name": "@recogito/plugin-template",
+  "name": "@recogito/plugin-ner",
   "version": "0.2.0",
-  "description": "A template to boot-strap a new Recogito Studio plugin project.",
+  "description": "Recogito Studio plugin which can perform Named Entity Recognition on TEI and Plain Text.",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
-    "dist"
+    "dist",
+    "src"
   ],
   "scripts": {
     "dev": "npm start --prefix .dev/",
     "build": "tsc && npm run copy-files",
-    "copy-files": "copyfiles -u 1 \"src/extensions/**/*.css\" \"src/extensions/**/*.jpg\" \"src/extensions/**/*.png\" dist"
+    "copy-files": "copyfiles -u 1 \"src/**/*.css\" \"src/**/*.jpg\" dist"
+  },
+  "exports": {
+    ".": "./dist/index.js",
+    "./DocumentMenuExtension": "./dist/components/DocumentMenuExtension.js",
+    "./NERAgentRoute.ts": "./dist/api/NERAgentRoute.js"
   },
   "devDependencies": {
+    "@trigger.dev/build": "^3.3.17",
     "@types/node": "^22.14.1",
     "@types/react": "^19.1.2",
     "@types/react-dom": "^19.1.2",
@@ -23,6 +30,10 @@
     "typescript": "^5.8.3"
   },
   "dependencies": {
-    "@recogito/studio-sdk": "^0.5.1"
+    "@recogito/standoff-converter": "^0.1.4",
+    "@recogito/studio-sdk": "^0.6.1",
+    "@trigger.dev/sdk": "^3.3.17",
+    "tus-js-client": "^4.3.1",
+    "uuid": "^11.1.0"
   }
 }
