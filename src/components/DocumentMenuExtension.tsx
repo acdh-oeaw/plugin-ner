@@ -2,7 +2,6 @@ import { DocumentCardActionsExtensionProps } from '@recogito/studio-sdk';
 import { MapPinArea } from '@phosphor-icons/react';
 import { getTranslations } from '../i18n';
 import './DocumentMenuExtension.css';
-import test from '../../test/fixtures.json';
 
 export const DocumentMenuExtension = (
   props: DocumentCardActionsExtensionProps
