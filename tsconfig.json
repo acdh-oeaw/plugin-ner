@@ -12,13 +12,13 @@
     "moduleResolution": "bundler",
     "outDir": "dist",
     "resolveJsonModule": true,
+    "rootDir": "src",
     "skipLibCheck": true,
     "strict": true,
     "target": "ESNext"
   },
   "include": [
-    "src",
-    "test"
+    "src/**/*"
   ],
   "exclude": ["node_modules", "dist"]
 }
