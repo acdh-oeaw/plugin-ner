@@ -4,10 +4,7 @@ export interface Translations {
   t: { [key: string]: string };
 }
 
-const DEFAULT_LANG: string =
-  // @ts-ignore
-  import.meta.env.PUBLIC_DEFAULT_LANGUAGE ||
-  process.env.PUBLIC_DEFAULT_LANGUAGE;
+const DEFAULT_LANG: string = import.meta.env.PUBLIC_DEFAULT_LANGUAGE;
 
 import de from "./de";
 import en from "./en";
