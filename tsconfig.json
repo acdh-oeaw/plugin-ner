@@ -18,8 +18,7 @@
   },
   "include": [
     "src",
-    "test",
-    "trigger.config.ts"
+    "test"
   ],
   "exclude": ["node_modules", "dist"]
 }
