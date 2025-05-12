@@ -1,5 +1,5 @@
-import type { APIRoute } from "astro";
-import { createServerSDK } from "@recogito/studio-sdk";
+import type { APIRoute } from 'astro';
+import { createServerSDK } from '@recogito/studio-sdk';
 
 export const GET: APIRoute = async ({ request, params, cookies }) => {
   const projectId = params.projectId;
@@ -11,7 +11,7 @@ export const GET: APIRoute = async ({ request, params, cookies }) => {
   const { error: profileError, data: profile } =
     await sdk.profile.getMyProfile();
   if (profileError || !profile)
-    return new Response(JSON.stringify({ message: "Not authorized" }));
+    return new Response(JSON.stringify({ message: 'Not authorized' }));
 
   const hasSelectPermissions = await sdk.project.hasSelectPermissions(
     profile,
@@ -19,9 +19,14 @@ export const GET: APIRoute = async ({ request, params, cookies }) => {
   );
 
   if (!hasSelectPermissions)
-    return new Response(JSON.stringify({ message: "Not authorized" }));
+    return new Response(JSON.stringify({ message: 'Not authorized' }));
 
-  return new Response(JSON.stringify({ message: "Success!" }), {
+  // Get the user's token
+  const auth = request.headers.get('Authorization');
+
+  console.log('Auth: ', auth);
+
+  return new Response(JSON.stringify({ message: 'Success!' }), {
     status: 200,
   });
 };
