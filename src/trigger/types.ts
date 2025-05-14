@@ -1,16 +1,17 @@
 export type TagTypes =
-  | "persName"
-  | "orgName"
-  | "placeName"
-  | "settlement"
-  | "country"
-  | "region"
-  | "date";
+  | 'persName'
+  | 'orgName'
+  | 'placeName'
+  | 'settlement'
+  | 'country'
+  | 'region'
+  | 'date';
 export type NEREntry = {
   text: string;
   startIndex: number;
   endIndex: number;
-  tag: TagTypes;
+  localizedTag: string;
+  inlineTag: TagTypes;
   attributes?: { [key: string]: string };
 };
 export type NERResults = {

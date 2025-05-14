@@ -1,5 +1,5 @@
-import { task } from "@trigger.dev/sdk/v3";
-import type { NERResults, TagTypes } from "../types";
+import { task } from '@trigger.dev/sdk/v3';
+import type { NERResults, TagTypes } from '../types';
 
 /*
 DATE, TIME, DURATION, SET, MONEY, NUMBER, ORDINAL, PERCENT, PERSON, LOCATION, ORGANIZATION, MISC, CAUSE_OF_DEATH, CITY, COUNTRY, CRIMINAL_CHARGE, EMAIL, IDEOLOGY, NATIONALITY, RELIGION, STATE_OR_PROVINCE, TITLE, URL
@@ -71,52 +71,82 @@ export interface Timex2 {
   altValue?: string;
 }
 
-const PERSON = ["PERSON"];
-const PLACE = ["LOCATION", "CITY", "COUNTRY", "STATE_OR_PROVINCE"];
-
 const entityMapping: {
-  [key: string]: { tag: TagTypes; attributes?: { [key: string]: string } };
+  [key: string]: {
+    tag: TagTypes;
+    attributes?: { [key: string]: string };
+    localized: { en: string; de: string };
+  };
 } = {
   PERSON: {
-    tag: "persName",
+    tag: 'persName',
+    localized: {
+      en: 'Person',
+      de: 'Person',
+    },
   },
   ORGANIZATION: {
-    tag: "orgName",
+    tag: 'orgName',
+    localized: {
+      en: 'Organization',
+      de: 'Organisation',
+    },
   },
   LOCATION: {
-    tag: "placeName",
+    tag: 'placeName',
+    localized: {
+      en: 'Location',
+      de: 'Standort',
+    },
   },
   CITY: {
-    tag: "settlement",
-    attributes: { type: "city" },
+    tag: 'settlement',
+    attributes: { type: 'city' },
+    localized: {
+      en: 'City',
+      de: 'Stadt',
+    },
   },
   COUNTRY: {
-    tag: "country",
+    tag: 'country',
+    localized: {
+      en: 'Country',
+      de: 'Land',
+    },
   },
   STATE_OR_PROVINCE: {
-    tag: "region",
+    tag: 'region',
+    localized: {
+      en: 'Province',
+      de: 'Provinz',
+    },
   },
   DATE: {
-    tag: "date",
+    tag: 'date',
+    localized: {
+      en: 'Date',
+      de: 'Datum',
+    },
   },
 };
 
 export const doStanfordNlp = task({
-  id: "do-nlp-ner",
-  run: async (payload: { data: string }, { ctx }) => {
+  id: 'do-nlp-ner',
+  run: async (payload: { data: string; language: 'en' | 'de' }, { ctx }) => {
     const { data } = payload;
 
-    const url = "http://localhost:9000"; // Default CoreNLP server URL
+    const url = 'http://localhost:9000'; // Default CoreNLP server URL
     const params = new URLSearchParams({
       properties: JSON.stringify({
-        annotators: "ner",
-        outputFormat: "json",
+        annotators: 'ner',
+        outputFormat: 'json',
+        lang: payload.language,
       }),
     });
     const resp = await fetch(`${url}/?${params}`, {
-      method: "POST",
+      method: 'POST',
       headers: {
-        "Content-Type": "text/plain; charset=UTF-8",
+        'Content-Type': 'text/plain; charset=UTF-8',
       },
       body: data,
     });
@@ -136,7 +166,8 @@ export const doStanfordNlp = task({
               text: mention.text,
               startIndex: mention.characterOffsetBegin,
               endIndex: mention.characterOffsetEnd,
-              tag: map.tag,
+              localizedTag: map.localized[payload.language],
+              inlineTag: map.tag,
               attributes: map.attributes,
             });
           }

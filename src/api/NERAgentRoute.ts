@@ -1,9 +1,15 @@
 import type { APIRoute } from 'astro';
 import { createServerSDK } from '@recogito/studio-sdk';
+import { stanfordCore } from '../trigger/stanfordCore';
 
-export const GET: APIRoute = async ({ request, params, cookies }) => {
+const supabaseServerUrl =
+  import.meta.env.SUPABASE_SERVERCLIENT_URL || import.meta.env.PUBLIC_SUPABASE;
+
+export const PUT: APIRoute = async ({ request, params, cookies }) => {
   const projectId = params.projectId;
   const documentId = params.documentId;
+
+  const body = await request.json();
 
   // @ts-ignore
   const sdk = await createServerSDK(request, cookies, import.meta.env);
@@ -21,12 +27,41 @@ export const GET: APIRoute = async ({ request, params, cookies }) => {
   if (!hasSelectPermissions)
     return new Response(JSON.stringify({ message: 'Not authorized' }));
 
-  // Get the user's token
-  const auth = request.headers.get('Authorization');
+  let handle;
+  if (body.model === 'stanford-core') {
+    handle = await stanfordCore.trigger({
+      projectId: projectId as string,
+      documentId: documentId as string,
+      language: body.language,
+      token: body.token,
+      serverURL: supabaseServerUrl,
+      nameOut: body.nameOut,
+    });
+  }
 
-  console.log('Auth: ', auth);
-
-  return new Response(JSON.stringify({ message: 'Success!' }), {
-    status: 200,
-  });
+  if (handle) {
+    return new Response(
+      JSON.stringify({
+        message: `Job is running with handle: ${handle.id}`,
+      }),
+      {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+  } else {
+    return new Response(
+      JSON.stringify({
+        message: `Failed to execute job`,
+      }),
+      {
+        status: 500,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+  }
 };

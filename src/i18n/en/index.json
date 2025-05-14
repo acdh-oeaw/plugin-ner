@@ -1,0 +1,18 @@
+{
+  "all": {
+    "Perform NER on Document": "Perform NER on Document",
+    "_private_document_message_": "This is a private document. Only the document owner can perform this action.",
+    "There has been an error!": "There has been an error!",
+    "OK": "OK",
+    "Configure NLP Model": "Configure NLP Model",
+    "_model_config_message_": "Configure the filename, language and NER model you wish to use. Try and create a unique filename to distinguish it from the original. Do not add any extensions (i.e. .xml) to the name. Once submitted, it may take a few minutes for the operation to complete. Once complete the new TEI document will be added to the project.",
+    "Submit": "Submit",
+    "Cancel": "Cancel",
+    "Stanford Core NLP": "Stanford Core NLP",
+    "Select Model to Use": "Select Model to Use",
+    "Select Language": "Select Language",
+    "English": "English",
+    "German": "German",
+    "Output File Name": "Output File Name"
+  }
+}

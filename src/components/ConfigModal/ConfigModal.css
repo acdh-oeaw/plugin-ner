@@ -1,0 +1,17 @@
+.config-modal-trigger {
+  width: 300px;
+}
+
+.config-modal-item {
+  width: 300px;
+}
+
+.config-modal-options {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.name-out-input {
+  width: 300px;
+}

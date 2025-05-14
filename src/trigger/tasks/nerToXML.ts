@@ -1,10 +1,10 @@
-import { task } from "@trigger.dev/sdk/v3";
-import type { NERResults } from "../types";
-import { parseXML } from "@recogito/standoff-converter";
-import * as uuid from "uuid";
+import { task } from '@trigger.dev/sdk/v3';
+import type { NERResults } from '../types';
+import { parseXML } from '@recogito/standoff-converter';
+import * as uuid from 'uuid';
 
 export const nerToXML = task({
-  id: "ner-to-xml",
+  id: 'ner-to-xml',
   run: async (
     payload: { nerData: NERResults; text: string; originalXML?: string },
     { ctx }
@@ -31,15 +31,15 @@ export const nerToXML = task({
       <text>
         <body>
           ${text
-            .split("\n\n")
+            .split('\n\n')
             .map(
               (paragraph) =>
                 `<p>${paragraph
-                  .replace(/&/g, "&amp;")
-                  .replace(/</g, "&lt;")
-                  .replace(/>/g, "&gt;")}</p>`
+                  .replace(/&/g, '&amp;')
+                  .replace(/</g, '&lt;')
+                  .replace(/>/g, '&gt;')}</p>`
             )
-            .join("\n")}
+            .join('\n')}
         </body>
       </text>
     </TEI>
@@ -53,15 +53,16 @@ export const nerToXML = task({
 
     for (let i = 0; i < nerData.entries.length; i++) {
       const entry = nerData.entries[i];
-      // console.log(
-      //   `Adding tag: ${entry.tag}:${entry.text}, start: ${entry.startIndex}, end: ${entry.endIndex}`
-      // );
+
+      // standoff.addStandOffTag(standoffId, entry.startIndex, entry.endIndex, {
+      //   label: entry.localizedTag,
+      //   id: entry.inlineTag,
+      // });
       standoff.addStandOffTag(
         standoffId,
         entry.startIndex,
         entry.endIndex,
-        entry.tag
-        //entry.attributes
+        entry.localizedTag
       );
     }
 

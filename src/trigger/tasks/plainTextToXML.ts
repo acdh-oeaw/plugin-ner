@@ -1,9 +1,8 @@
-import { task } from "@trigger.dev/sdk/v3";
-import type { NERResults } from "../types";
-import { parseXML } from "@recogito/standoff-converter";
+import { task } from '@trigger.dev/sdk/v3';
+import { parseXML } from '@recogito/standoff-converter';
 
 export const plainTextToXML = task({
-  id: "plain-text-to-xml",
+  id: 'plain-text-to-xml',
   run: async (payload: { text: string }, { ctx }) => {
     const { text } = payload;
 
@@ -25,21 +24,20 @@ export const plainTextToXML = task({
       <text>
         <body>
           ${text
-            .split("\n\n")
+            .split('\n\n')
             .map(
               (paragraph) =>
                 `<p>${paragraph
-                  .replace(/&/g, "&amp;")
-                  .replace(/</g, "&lt;")
-                  .replace(/>/g, "&gt;")}</p>`
+                  .replace(/&/g, '&amp;')
+                  .replace(/</g, '&lt;')
+                  .replace(/>/g, '&gt;')}</p>`
             )
-            .join("\n")}
+            .join('\n')}
         </body>
       </text>
     </TEI>
   `;
 
-    console.log(xml);
     const standoff = parseXML(xml);
 
     const newXML = standoff.xmlString();

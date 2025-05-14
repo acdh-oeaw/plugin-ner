@@ -1,25 +1,31 @@
-import { createClient } from "@supabase/supabase-js";
-import { task, logger } from "@trigger.dev/sdk/v3";
-import * as tus from "tus-js-client";
-
-const supabaseServerUrl = process.env.SUPABASE_PUBLIC_URL;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY;
-
-type Meta = {
-  type: string;
-};
+import { SupabaseClient, createClient } from '@supabase/supabase-js';
+import { task, logger } from '@trigger.dev/sdk/v3';
+import * as tus from 'tus-js-client';
 
 export const uploadDocumentToRS = task({
-  id: "upload-document-to-rs",
+  id: 'upload-document-to-rs',
   run: async (
-    payload: { id: string; documentData: string; name: string; type: string },
+    payload: {
+      id: string;
+      documentData: string;
+      name: string;
+      type: string;
+      projectId: string;
+      documentId: string;
+      key: string;
+      supabaseURL: string;
+    },
     { ctx }
   ) => {
-    const { documentData, name, type } = payload;
-    const supabase = createClient(
-      supabaseServerUrl as string,
-      supabaseServiceKey as string
-    );
+    const {
+      documentData,
+      name,
+      type,
+      key,
+      projectId,
+      documentId,
+      supabaseURL,
+    } = payload;
 
     const uploadFile = async (
       file: Buffer,
@@ -30,23 +36,23 @@ export const uploadDocumentToRS = task({
       return new Promise((resolve, reject) => {
         // @ts-ignore
         const upload = new tus.Upload(file, {
-          endpoint: `${supabaseServerUrl}/storage/v1/upload/resumable`,
+          endpoint: `${supabaseURL}/storage/v1/upload/resumable`,
           retryDelays: [0, 3000, 5000, 10000, 20000],
           headers: {
-            authorization: `Bearer ${supabaseServiceKey}`,
-            "x-upsert": "true", // optionally set upsert to true to overwrite existing files
+            authorization: `Bearer ${key}`,
+            'x-upsert': 'true', // optionally set upsert to true to overwrite existing files
           },
           uploadDataDuringCreation: true,
           removeFingerprintOnSuccess: true, // Important if you want to allow re-uploading the same file https://github.com/tus/tus-js-client/blob/main/docs/api.md#removefingerprintonsuccess
           metadata: {
-            bucketName: "documents",
+            bucketName: 'documents',
             objectName: name,
             contentType: type,
-            cacheControl: "3600",
+            cacheControl: '3600',
           },
           chunkSize: 6 * 1024 * 1024, // NOTE: it must be set to 6MB (for now) do not change it
           onError: function (error: any) {
-            logger.log("Failed because: " + error);
+            logger.log('Failed because: ' + error);
             reject(error);
           },
           onProgress: function (bytesUploaded: number, bytesTotal: number) {
@@ -71,36 +77,59 @@ export const uploadDocumentToRS = task({
       });
     };
 
-    const result = await supabase
-      .from("documents")
-      .insert({
-        name: name,
-        content_type: type,
-        bucket_id: "documents",
-        meta_data: {},
-      })
-      .select()
-      .single();
+    logger.info('Creating Supabase client');
+    const supabase = createClient(supabaseURL, key);
 
-    if (result.error) {
-      logger.error(
-        `Failed to create Recogito Studio document: ${JSON.stringify(
-          result.error,
-          null,
-          2
-        )}`
-      );
-      return false;
+    if (supabase) {
+      logger.info('Getting document');
+      const result = await supabase
+        .from('documents')
+        .insert({
+          name: name,
+          content_type: type,
+          bucket_id: 'documents',
+          meta_data: {},
+        })
+        .select()
+        .single();
+
+      if (result.error) {
+        logger.error(
+          `Failed to create Recogito Studio document: ${JSON.stringify(
+            result.error,
+            null,
+            2
+          )}`
+        );
+        return false;
+      }
+
+      const onProgress = (progress: number) => {
+        logger.log(`Upload Progress: ${progress}%`);
+      };
+
+      const blob = new Blob([documentData], { type: type });
+      const arrayBuffer = await blob.arrayBuffer();
+      const buffer = Buffer.from(arrayBuffer);
+
+      logger.info('Uploading to RS');
+      await uploadFile(buffer, result.data.id, type, onProgress);
+
+      logger.info('Add document to project');
+      let addResult = await supabase.rpc('add_documents_to_project_rpc', {
+        _document_ids: [result.data.id],
+        _project_id: projectId,
+      });
+
+      if (addResult.error) {
+        logger.error(addResult.error.message);
+        throw new Error(addResult.error.message);
+      }
+
+      return true;
+    } else {
+      logger.error('Failed to create Supabase client');
+      throw new Error('Failed to create Supabase client');
     }
-
-    const onProgress = (progress: number) => {
-      logger.log(`Upload Progress: ${progress}%`);
-    };
-
-    const blob = new Blob([documentData], { type: type });
-    const arrayBuffer = await blob.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-
-    await uploadFile(buffer, result.data.id, type, onProgress);
   },
 });
