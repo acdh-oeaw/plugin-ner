@@ -9,9 +9,8 @@ import { Document } from '@recogito/studio-sdk';
 import { xmlToPlainText } from './tasks/xmlToPlainText';
 
 configure({
-  secretKey:
-    process.env.TRIGGER_SECRET_KEY || import.meta.env.TRIGGER_SECRET_KEY,
-  baseURL: process.env.TRIGGER_SERVER_URL || import.meta.env.TRIGGER_SERVER_URL,
+  secretKey: process.env.TRIGGER_SECRET_KEY, // || import.meta.env.TRIGGER_SECRET_KEY,
+  baseURL: process.env.TRIGGER_SERVER_URL, // || import.meta.env.TRIGGER_SERVER_URL,
 });
 
 export const stanfordCore = task({

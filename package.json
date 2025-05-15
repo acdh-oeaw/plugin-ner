@@ -35,7 +35,7 @@
     "@radix-ui/react-dialog": "^1.1.13",
     "@radix-ui/react-label": "^2.1.6",
     "@radix-ui/react-select": "^2.2.4",
-    "@recogito/standoff-converter": "^0.1.4",
+    "@recogito/standoff-converter": "^0.1.6",
     "@recogito/studio-sdk": "file:../recogito-studio-sdk",
     "@supabase/supabase-js": "^2.49.4",
     "@trigger.dev/sdk": "^3.3.17",

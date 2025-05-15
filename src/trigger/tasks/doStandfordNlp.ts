@@ -130,6 +130,8 @@ const entityMapping: {
   },
 };
 
+const CoreNLPUrl = 
+
 export const doStanfordNlp = task({
   id: 'do-nlp-ner',
   run: async (payload: { data: string; language: 'en' | 'de' }, { ctx }) => {

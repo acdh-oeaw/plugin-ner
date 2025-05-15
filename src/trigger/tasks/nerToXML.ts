@@ -54,16 +54,16 @@ export const nerToXML = task({
     for (let i = 0; i < nerData.entries.length; i++) {
       const entry = nerData.entries[i];
 
-      // standoff.addStandOffTag(standoffId, entry.startIndex, entry.endIndex, {
-      //   label: entry.localizedTag,
-      //   id: entry.inlineTag,
-      // });
-      standoff.addStandOffTag(
-        standoffId,
-        entry.startIndex,
-        entry.endIndex,
-        entry.localizedTag
-      );
+      standoff.addStandOffTag(standoffId, entry.startIndex, entry.endIndex, {
+        label: entry.localizedTag,
+        id: entry.inlineTag,
+      });
+      // standoff.addStandOffTag(
+      //   standoffId,
+      //   entry.startIndex,
+      //   entry.endIndex,
+      //   entry.localizedTag
+      // );
     }
 
     const tei = standoff.xmlString();
