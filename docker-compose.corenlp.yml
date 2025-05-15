@@ -5,7 +5,7 @@ services:
     build:
       context: https://github.com/NLPbox/stanford-corenlp-docker.git
     ports:
-      - 9000:9000
+      - 9090:9000
     restart: unless-stopped
     logging:
       driver: 'json-file'
