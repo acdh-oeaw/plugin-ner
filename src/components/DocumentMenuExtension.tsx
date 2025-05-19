@@ -29,7 +29,7 @@ export const DocumentMenuExtension = (
   const handleClick = async (evt: any) => {
     evt.preventDefault();
     evt.stopPropagation();
-    const result = await sdk!.document.getDocument(props.document.id);
+    const result = await sdk!.documents.getDocument(props.document.id);
 
     if (result.error) {
       console.log('Failed to retrieve document!');
