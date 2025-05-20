@@ -1,4 +1,4 @@
-import { useState, MouseEvent, KeyboardEvent } from 'react';
+import { useState, MouseEvent, KeyboardEvent, PointerEvent } from 'react';
 import * as Dialog from '@radix-ui/react-dialog';
 import * as Select from '@radix-ui/react-select';
 import * as Label from '@radix-ui/react-label';
@@ -39,6 +39,9 @@ export const ConfigModal = (props: ConfigModalProps) => {
   const handleClick = (evt: MouseEvent) =>
     evt.stopPropagation();
 
+  const handlePointerMove = (evt: PointerEvent) => 
+    evt.stopPropagation();
+
   const handleSubmit = (evt: any) => {
     evt.preventDefault();
     evt.stopPropagation();
@@ -58,7 +61,8 @@ export const ConfigModal = (props: ConfigModalProps) => {
         <Dialog.Content 
           className='dialog-content' 
           onClick={handleClick} 
-          onKeyDown={handleKeyDown}>
+          onKeyDown={handleKeyDown}
+          onPointerMove={handlePointerMove}>
           <Dialog.Title className='dialog-title'>
             {t['Configure NLP Model']}
           </Dialog.Title>
@@ -71,7 +75,6 @@ export const ConfigModal = (props: ConfigModalProps) => {
               type='text'
               id='nameOut'
               name='nameOut'
-              required
               className='name-out-input'
               value={nameOut}
               onChange={(ev) => setNameOut(ev.target.value)}
