@@ -1,9 +1,19 @@
 import type { APIRoute } from 'astro';
 import { createServerSDK } from '@recogito/studio-sdk';
 import { stanfordCore } from '../trigger/stanfordCore';
+import { configure } from '@trigger.dev/sdk/v3';
 
 const supabaseServerUrl =
   import.meta.env.SUPABASE_SERVERCLIENT_URL || import.meta.env.PUBLIC_SUPABASE;
+
+const supabaseAPIKey = import.meta.env.PUBLIC_SUPABASE_API_KEY;
+
+configure({
+  secretKey:
+    process?.env.TRIGGER_SECRET_KEY || import.meta.env.TRIGGER_SECRET_KEY,
+  baseURL:
+    process?.env.TRIGGER_SERVER_URL || import.meta.env.TRIGGER_SERVER_URL,
+});
 
 export const PUT: APIRoute = async ({ request, params, cookies }) => {
   const projectId = params.projectId;
@@ -34,6 +44,7 @@ export const PUT: APIRoute = async ({ request, params, cookies }) => {
       documentId: documentId as string,
       language: body.language,
       token: body.token,
+      key: supabaseAPIKey,
       serverURL: supabaseServerUrl,
       nameOut: body.nameOut,
     });

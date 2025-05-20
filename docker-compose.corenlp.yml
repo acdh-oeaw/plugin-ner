@@ -2,8 +2,7 @@ name: stanford-corenlp
 
 services:
   corenlp:
-    build:
-      context: https://github.com/NLPbox/stanford-corenlp-docker.git
+    build: ./
     ports:
       - 9090:9000
     restart: unless-stopped

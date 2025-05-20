@@ -1,4 +1,4 @@
-import { task } from '@trigger.dev/sdk/v3';
+import { task, logger } from '@trigger.dev/sdk/v3';
 import type { NERResults, TagTypes } from '../types';
 
 /*
@@ -178,8 +178,10 @@ export const doStanfordNlp = task({
           }
         }
       }
+      return { ner: ret };
+    } else {
+      logger.error(resp.statusText);
+      throw new Error(resp.statusText);
     }
-
-    return { ner: ret };
   },
 });

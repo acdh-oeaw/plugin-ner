@@ -8,11 +8,6 @@ import { createClient } from '@supabase/supabase-js';
 import { Document } from '@recogito/studio-sdk';
 import { xmlToPlainText } from './tasks/xmlToPlainText';
 
-configure({
-  secretKey: process?.env.TRIGGER_SECRET_KEY, // || import.meta.env.TRIGGER_SECRET_KEY,
-  baseURL: process?.env.TRIGGER_SERVER_URL, // || import.meta.env.TRIGGER_SERVER_URL,
-});
-
 export const stanfordCore = task({
   id: 'stanford-core',
   run: async (payload: {
@@ -21,10 +16,17 @@ export const stanfordCore = task({
     documentId: string;
     nameOut: string;
     language: 'en' | 'de';
+    key: string;
     token: string;
   }) => {
     logger.info('Creating Supabase client');
-    const supabase = createClient(payload.serverURL, payload.token);
+    const supabase = createClient(payload.serverURL, payload.key, {
+      global: {
+        headers: {
+          Authorization: `Bearer ${payload.token}`,
+        },
+      },
+    });
 
     if (supabase) {
       logger.info('Get Document data');
@@ -99,7 +101,8 @@ export const stanfordCore = task({
           type: 'text/xml',
           projectId: payload.projectId,
           documentId: payload.documentId,
-          key: payload.token,
+          key: payload.key,
+          token: payload.token,
           supabaseURL: payload.serverURL,
         })
         .unwrap();
