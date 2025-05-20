@@ -130,9 +130,14 @@ const entityMapping: {
   },
 };
 
-const CoreNLPUrl =
-  process?.env.CORENLP_URL ||
-  import.meta.env.CORENLP_URL ||
+const CoreNLPUrlEN =
+  process?.env.CORENLP_URL_EN ||
+  import.meta.env.CORENLP_URL_EN ||
+  'http://localhost:9000';
+
+const CoreNLPUrlDE =
+  process?.env.CORENLP_URL_DE ||
+  import.meta.env.CORENLP_URL_DE ||
   'http://localhost:9000';
 
 export const doStanfordNlp = task({
@@ -140,14 +145,14 @@ export const doStanfordNlp = task({
   run: async (payload: { data: string; language: 'en' | 'de' }, { ctx }) => {
     const { data, language } = payload;
 
-    const url = CoreNLPUrl; // Default CoreNLP server URL
+    const url = language === 'en' ? CoreNLPUrlEN : CoreNLPUrlDE; // Default CoreNLP server URL
     const params = new URLSearchParams({
       properties: JSON.stringify({
         annotators: 'ner',
         outputFormat: 'json',
       }),
     });
-    const resp = await fetch(`${url}/?${params}&pipelineLanguage=${language}`, {
+    const resp = await fetch(`${url}/?${params}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'text/plain; charset=UTF-8',
