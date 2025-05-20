@@ -130,14 +130,17 @@ const entityMapping: {
   },
 };
 
-// const CoreNLPUrl = 
+const CoreNLPUrl =
+  process?.env.CORENLP_URL ||
+  import.meta.env.CORENLP_URL ||
+  'http://localhost:9000';
 
 export const doStanfordNlp = task({
   id: 'do-nlp-ner',
   run: async (payload: { data: string; language: 'en' | 'de' }, { ctx }) => {
     const { data } = payload;
 
-    const url = 'http://localhost:9000'; // Default CoreNLP server URL
+    const url = CoreNLPUrl; // Default CoreNLP server URL
     const params = new URLSearchParams({
       properties: JSON.stringify({
         annotators: 'ner',
