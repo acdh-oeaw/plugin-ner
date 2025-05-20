@@ -29,6 +29,7 @@ export const DocumentMenuExtension = (
   const handleClick = async (evt: any) => {
     evt.preventDefault();
     evt.stopPropagation();
+    
     const result = await sdk!.documents.get(props.document.id);
 
     if (result.error) {
@@ -57,6 +58,7 @@ export const DocumentMenuExtension = (
   const handleSubmit = async (config: NERConfig) => {
     const { data, error } = await sdk!.supabase.auth.getSession();
     setConfigOpen(false);
+
     if (error) {
       setErrorMessage(error.message);
       setErrorOpen(true);
@@ -84,17 +86,18 @@ export const DocumentMenuExtension = (
   };
 
   return (
-    <>
-      <div className='dme-menu-item' onClick={handleClick}>
-        <MapPinArea size={16} color='#6f747c' />
-        {t['Perform NER on Document']}
-      </div>
+    <div className='dme-menu-item'>
+      <button onClick={handleClick}>
+        <MapPinArea size={16} color='#6f747c' /> {t['Perform NER on Document']}
+      </button>
+
       <ErrorModal
         i18n={i18n}
         open={errorOpen}
         message={errorMessage}
         onClose={() => setErrorOpen(false)}
       />
+
       <ConfigModal
         i18n={i18n}
         open={configOpen}
@@ -102,6 +105,6 @@ export const DocumentMenuExtension = (
         onClose={() => setConfigOpen(false)}
         onSubmit={handleSubmit}
       />
-    </>
+    </div>
   );
 };

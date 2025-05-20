@@ -37,7 +37,7 @@
     "@radix-ui/react-select": "^2.2.4",
     "@recogito/standoff-converter": "^0.1.8",
     "@recogito/studio-sdk": "^0.6.4",
-    "@supabase/supabase-js": "^2.49.4",
+    "@supabase/supabase-js": "^2.49.5",
     "@trigger.dev/sdk": "^3.3.17",
     "tus-js-client": "^4.3.1",
     "uuid": "^11.1.0"

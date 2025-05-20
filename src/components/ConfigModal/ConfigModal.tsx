@@ -1,9 +1,9 @@
+import { useState, MouseEvent, KeyboardEvent } from 'react';
 import * as Dialog from '@radix-ui/react-dialog';
 import * as Select from '@radix-ui/react-select';
 import * as Label from '@radix-ui/react-label';
 import { CaretDown } from '@phosphor-icons/react';
 import { Translations } from 'src/i18n';
-import { useState } from 'react';
 
 import './ConfigModal.css';
 
@@ -11,7 +11,8 @@ export type NERConfig = {
   nameOut: string;
   language: 'en' | 'de';
   model: string;
-};
+}
+
 interface ConfigModalProps {
   open: boolean;
   i18n: Translations;
@@ -19,6 +20,7 @@ interface ConfigModalProps {
   onClose(): void;
   onSubmit(config: NERConfig): void;
 }
+
 export const ConfigModal = (props: ConfigModalProps) => {
   const { t } = props.i18n;
 
@@ -28,6 +30,14 @@ export const ConfigModal = (props: ConfigModalProps) => {
 
   const modelString =
     model.length > 0 ? props.options.find((o) => o.value === model)?.label : '';
+  
+  // Stops keyboard events from propagating to Radix dropdown
+  const handleKeyDown = (evt: KeyboardEvent) =>
+    evt.stopPropagation();
+
+  // Stops click event from propagating to Radix dropdown
+  const handleClick = (evt: MouseEvent) =>
+    evt.stopPropagation();
 
   const handleSubmit = (evt: any) => {
     evt.preventDefault();
@@ -40,9 +50,15 @@ export const ConfigModal = (props: ConfigModalProps) => {
 
   return (
     <Dialog.Root open={props.open}>
+      <Dialog.Overlay className='dialog-overlay' />
+      
       <Dialog.Portal>
         <Dialog.Overlay className='dialog-overlay' />
-        <Dialog.Content className='dialog-content'>
+
+        <Dialog.Content 
+          className='dialog-content' 
+          onClick={handleClick} 
+          onKeyDown={handleKeyDown}>
           <Dialog.Title className='dialog-title'>
             {t['Configure NLP Model']}
           </Dialog.Title>
@@ -59,10 +75,6 @@ export const ConfigModal = (props: ConfigModalProps) => {
               className='name-out-input'
               value={nameOut}
               onChange={(ev) => setNameOut(ev.target.value)}
-              onClick={(evt) => {
-                evt.preventDefault();
-                evt.stopPropagation();
-              }}
             />
             <Label.Root>{t['Select Model to Use']}</Label.Root>
             <Select.Root
