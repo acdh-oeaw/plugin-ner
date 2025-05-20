@@ -138,17 +138,16 @@ const CoreNLPUrl =
 export const doStanfordNlp = task({
   id: 'do-nlp-ner',
   run: async (payload: { data: string; language: 'en' | 'de' }, { ctx }) => {
-    const { data } = payload;
+    const { data, language } = payload;
 
     const url = CoreNLPUrl; // Default CoreNLP server URL
     const params = new URLSearchParams({
       properties: JSON.stringify({
         annotators: 'ner',
         outputFormat: 'json',
-        lang: payload.language,
       }),
     });
-    const resp = await fetch(`${url}/?${params}`, {
+    const resp = await fetch(`${url}/?${params}&pipelineLanguage=${language}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'text/plain; charset=UTF-8',

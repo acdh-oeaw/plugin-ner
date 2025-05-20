@@ -3,8 +3,25 @@ name: stanford-corenlp
 services:
   corenlp:
     build: ./
+      context: Dockerfile.en
     ports:
       - 9090:9000
+    restart: unless-stopped
+    logging:
+      driver: 'json-file'
+      options:
+        max-size: '10m'
+        max-file: '3'
+    environment:
+      - JAVA_XMX=6g
+      - CORENLP_TIMEOUT=60000
+      - TIMEOUT_MILLISECONDS=60000
+
+  corenlp-de:
+    build: ./
+      context: Dockerfile.de
+    ports:
+      - 9099:9000
     restart: unless-stopped
     logging:
       driver: 'json-file'
