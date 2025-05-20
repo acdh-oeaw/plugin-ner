@@ -2,7 +2,7 @@ name: stanford-corenlp
 
 services:
   corenlp:
-    build: ./
+    build:
       dockerfile: Dockerfile.en
     ports:
       - 9090:9000
@@ -18,7 +18,7 @@ services:
       - TIMEOUT_MILLISECONDS=60000
 
   corenlp-de:
-    build: ./
+    build:
       dockerfile: Dockerfile.de
     ports:
       - 9099:9000
