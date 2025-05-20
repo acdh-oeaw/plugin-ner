@@ -11,7 +11,6 @@ export const PUT: APIRoute = async ({ request, params, cookies }) => {
 
   const body = await request.json();
 
-  // @ts-ignore
   const sdk = await createServerSDK(request, cookies, import.meta.env);
 
   const { error: profileError, data: profile } =
