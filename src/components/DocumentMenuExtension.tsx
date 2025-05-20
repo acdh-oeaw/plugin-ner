@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import {
   DocumentCardActionsExtensionProps,
   createBrowserSDK,
@@ -5,11 +6,10 @@ import {
 } from '@recogito/studio-sdk';
 import { MapPinArea } from '@phosphor-icons/react';
 import { getTranslations } from '../i18n';
-import { useState } from 'react';
-
-import './DocumentMenuExtension.css';
 import { ErrorModal } from './ErrorModal';
 import { ConfigModal, NERConfig } from './ConfigModal';
+
+import './DocumentMenuExtension.css';
 
 export const DocumentMenuExtension = (
   props: DocumentCardActionsExtensionProps
