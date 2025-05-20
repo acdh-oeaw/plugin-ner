@@ -1,4 +1,4 @@
-import { useState, MouseEvent, KeyboardEvent, PointerEvent } from 'react';
+import { useState } from 'react';
 import * as Dialog from '@radix-ui/react-dialog';
 import * as Select from '@radix-ui/react-select';
 import * as Label from '@radix-ui/react-label';
@@ -31,16 +31,7 @@ export const ConfigModal = (props: ConfigModalProps) => {
   const modelString =
     model.length > 0 ? props.options.find((o) => o.value === model)?.label : '';
   
-  // Stops keyboard events from propagating to Radix dropdown
-  const handleKeyDown = (evt: KeyboardEvent) =>
-    evt.stopPropagation();
 
-  // Stops click event from propagating to Radix dropdown
-  const handleClick = (evt: MouseEvent) =>
-    evt.stopPropagation();
-
-  const handlePointerMove = (evt: PointerEvent) => 
-    evt.stopPropagation();
 
   const handleSubmit = (evt: any) => {
     evt.preventDefault();
@@ -58,11 +49,7 @@ export const ConfigModal = (props: ConfigModalProps) => {
       <Dialog.Portal>
         <Dialog.Overlay className='dialog-overlay' />
 
-        <Dialog.Content 
-          className='dialog-content' 
-          onClick={handleClick} 
-          onKeyDown={handleKeyDown}
-          onPointerMove={handlePointerMove}>
+        <Dialog.Content className='dialog-content'>
           <Dialog.Title className='dialog-title'>
             {t['Configure NLP Model']}
           </Dialog.Title>

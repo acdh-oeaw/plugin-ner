@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, KeyboardEvent, MouseEvent, PointerEvent } from 'react';
 import {
   DocumentCardActionsExtensionProps,
   createBrowserSDK,
@@ -26,10 +26,7 @@ export const DocumentMenuExtension = (
     { value: 'stanford-core', label: t['Stanford Core NLP'] },
   ];
 
-  const handleClick = async (evt: any) => {
-    evt.preventDefault();
-    evt.stopPropagation();
-    
+  const onOpenDialog = async (evt: any) => {    
     const result = await sdk!.documents.get(props.document.id);
 
     if (result.error) {
@@ -55,7 +52,7 @@ export const DocumentMenuExtension = (
     setConfigOpen(true);
   };
 
-  const handleSubmit = async (config: NERConfig) => {
+  const onSubmit = async (config: NERConfig) => {
     const { data, error } = await sdk!.supabase.auth.getSession();
     setConfigOpen(false);
 
@@ -85,9 +82,23 @@ export const DocumentMenuExtension = (
     }
   };
 
+  // Stops events from propagating upwards to Radix dropdown
+  const stopKeyDown = (evt: KeyboardEvent) =>
+    evt.stopPropagation();
+
+  const stopClick = (evt: MouseEvent) =>
+    evt.stopPropagation();
+
+  const stopPointerMove = (evt: PointerEvent) => 
+    evt.stopPropagation();
+
   return (
-    <div className='dme-menu-item'>
-      <button onClick={handleClick}>
+    <div 
+      className='dme-menu-item'
+      onKeyDown={stopKeyDown}
+      onClick={stopClick}
+      onPointerMove={stopPointerMove}>
+      <button onClick={onOpenDialog}>
         <MapPinArea size={16} color='#6f747c' /> {t['Perform NER on Document']}
       </button>
 
@@ -103,7 +114,7 @@ export const DocumentMenuExtension = (
         open={configOpen}
         options={NEROptions}
         onClose={() => setConfigOpen(false)}
-        onSubmit={handleSubmit}
+        onSubmit={onSubmit}
       />
     </div>
   );
