@@ -13,6 +13,7 @@ export const uploadDocumentToRS = task({
       projectId: string;
       documentId: string;
       key: string;
+      token: string;
       supabaseURL: string;
     },
     { ctx }
@@ -22,6 +23,7 @@ export const uploadDocumentToRS = task({
       name,
       type,
       key,
+      token,
       projectId,
       documentId,
       supabaseURL,
@@ -39,7 +41,7 @@ export const uploadDocumentToRS = task({
           endpoint: `${supabaseURL}/storage/v1/upload/resumable`,
           retryDelays: [0, 3000, 5000, 10000, 20000],
           headers: {
-            authorization: `Bearer ${key}`,
+            authorization: `Bearer ${token}`,
             'x-upsert': 'true', // optionally set upsert to true to overwrite existing files
           },
           uploadDataDuringCreation: true,
@@ -78,7 +80,13 @@ export const uploadDocumentToRS = task({
     };
 
     logger.info('Creating Supabase client');
-    const supabase = createClient(supabaseURL, key);
+    const supabase = createClient(supabaseURL, key, {
+      global: {
+        headers: {
+          Authorization: `Bearer ${payload.token}`,
+        },
+      },
+    });
 
     if (supabase) {
       logger.info('Getting document');

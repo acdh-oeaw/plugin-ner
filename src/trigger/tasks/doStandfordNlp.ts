@@ -1,4 +1,4 @@
-import { task } from '@trigger.dev/sdk/v3';
+import { task, logger } from '@trigger.dev/sdk/v3';
 import type { NERResults, TagTypes } from '../types';
 
 /*
@@ -130,19 +130,26 @@ const entityMapping: {
   },
 };
 
-// const CoreNLPUrl = 
+const CoreNLPUrlEN =
+  process?.env.CORENLP_URL_EN ||
+  import.meta.env.CORENLP_URL_EN ||
+  'http://localhost:9000';
+
+const CoreNLPUrlDE =
+  process?.env.CORENLP_URL_DE ||
+  import.meta.env.CORENLP_URL_DE ||
+  'http://localhost:9000';
 
 export const doStanfordNlp = task({
   id: 'do-nlp-ner',
   run: async (payload: { data: string; language: 'en' | 'de' }, { ctx }) => {
-    const { data } = payload;
+    const { data, language } = payload;
 
-    const url = 'http://localhost:9000'; // Default CoreNLP server URL
+    const url = language === 'en' ? CoreNLPUrlEN : CoreNLPUrlDE; // Default CoreNLP server URL
     const params = new URLSearchParams({
       properties: JSON.stringify({
         annotators: 'ner',
         outputFormat: 'json',
-        lang: payload.language,
       }),
     });
     const resp = await fetch(`${url}/?${params}`, {
@@ -175,8 +182,10 @@ export const doStanfordNlp = task({
           }
         }
       }
+      return { ner: ret };
+    } else {
+      logger.error(resp.statusText);
+      throw new Error(resp.statusText);
     }
-
-    return { ner: ret };
   },
 });
