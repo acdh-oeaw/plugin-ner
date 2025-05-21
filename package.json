@@ -23,7 +23,7 @@
   },
   "devDependencies": {
     "@trigger.dev/build": "^3.3.17",
-    "@types/node": "^22.15.19",
+    "@types/node": "^22.15.21",
     "@types/react": "^19.1.4",
     "@types/react-dom": "^19.1.5",
     "astro": "^5.7.13",
@@ -34,12 +34,12 @@
   },
   "dependencies": {
     "@phosphor-icons/react": "2.1.7",
-    "@radix-ui/react-dialog": "^1.1.13",
-    "@radix-ui/react-label": "^2.1.6",
-    "@radix-ui/react-select": "^2.2.4",
-    "@recogito/standoff-converter": "^0.1.8",
-    "@recogito/studio-sdk": "0.6.4",
-    "@supabase/supabase-js": "^2.49.4",
+    "@radix-ui/react-dialog": "^1.1.14",
+    "@radix-ui/react-label": "^2.1.7",
+    "@radix-ui/react-select": "^2.2.5",
+    "@recogito/standoff-converter": "^0.1.10",
+    "@recogito/studio-sdk": "^0.6.6",
+    "@supabase/supabase-js": "^2.49.7",
     "@trigger.dev/sdk": "^3.3.17",
     "tus-js-client": "^4.3.1",
     "uuid": "^11.1.0"

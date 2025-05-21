@@ -1,5 +1,18 @@
 {
   "all": {
-    "Perform NER on Document": "Perform NER on Document"
+    "Perform NER on Document": "Named Entity Recognition",
+    "_private_document_message_": "Diese Dokument ist privat. Nur der Besiter kann diese Aktion ausführen.",
+    "There has been an error!": "Es gab einen Fehler.",
+    "OK": "OK",
+    "Configure NLP Model": "NLP Modell Konfigurieren",
+    "_model_config_message_": "Konfiguriere den Dateinamen, die Sprache und das NER Modell. Versuche, einen einzigartigen Dateinamen zu wählen, um das Ergebnis-Dokument vom Original zu unterscheiden. Verwende keine Datei-Erweiterungen (z.B. .xml). Nach dem Start kann es einige Minuten dauern, bis die Verarbeitung abgeschlossen ist. Danach wird das neue TEI Dokument dem Projekt hinzugefügt.",
+    "Submit": "Start",
+    "Cancel": "Abbrechen",
+    "Stanford Core NLP": "Stanford Core NLP",
+    "Select Model to Use": "NER Modell",
+    "Select Language": "Sprache",
+    "English": "Englisch",
+    "German": "Deutsch",
+    "Output File Name": "Ergebnis Datei-Name"
   }
 }

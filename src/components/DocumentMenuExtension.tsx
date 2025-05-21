@@ -1,3 +1,4 @@
+import { useState, KeyboardEvent, MouseEvent, PointerEvent } from 'react';
 import {
   DocumentCardActionsExtensionProps,
   createBrowserSDK,
@@ -5,11 +6,10 @@ import {
 } from '@recogito/studio-sdk';
 import { MapPinArea } from '@phosphor-icons/react';
 import { getTranslations } from '../i18n';
-import { useState } from 'react';
-
-import './DocumentMenuExtension.css';
 import { ErrorModal } from './ErrorModal';
 import { ConfigModal, NERConfig } from './ConfigModal';
+
+import './DocumentMenuExtension.css';
 
 export const DocumentMenuExtension = (
   props: DocumentCardActionsExtensionProps
@@ -26,9 +26,7 @@ export const DocumentMenuExtension = (
     { value: 'stanford-core', label: t['Stanford Core NLP'] },
   ];
 
-  const handleClick = async (evt: any) => {
-    evt.preventDefault();
-    evt.stopPropagation();
+  const onOpenDialog = async (evt: any) => {    
     const result = await sdk!.documents.get(props.document.id);
 
     if (result.error) {
@@ -54,9 +52,10 @@ export const DocumentMenuExtension = (
     setConfigOpen(true);
   };
 
-  const handleSubmit = async (config: NERConfig) => {
+  const onSubmit = async (config: NERConfig) => {
     const { data, error } = await sdk!.supabase.auth.getSession();
     setConfigOpen(false);
+
     if (error) {
       setErrorMessage(error.message);
       setErrorOpen(true);
@@ -83,25 +82,40 @@ export const DocumentMenuExtension = (
     }
   };
 
+  // Stops events from propagating upwards to Radix dropdown
+  const stopKeyDown = (evt: KeyboardEvent) =>
+    evt.stopPropagation();
+
+  const stopClick = (evt: MouseEvent) =>
+    evt.stopPropagation();
+
+  const stopPointerMove = (evt: PointerEvent) => 
+    evt.stopPropagation();
+
   return (
-    <>
-      <div className='dme-menu-item' onClick={handleClick}>
-        <MapPinArea size={16} color='#6f747c' />
-        {t['Perform NER on Document']}
-      </div>
+    <div 
+      className='dme-menu-item'
+      onKeyDown={stopKeyDown}
+      onClick={stopClick}
+      onPointerMove={stopPointerMove}>
+      <button onClick={onOpenDialog}>
+        <MapPinArea size={16} color='#6f747c' /> {t['Perform NER on Document']}
+      </button>
+
       <ErrorModal
         i18n={i18n}
         open={errorOpen}
         message={errorMessage}
         onClose={() => setErrorOpen(false)}
       />
+
       <ConfigModal
         i18n={i18n}
         open={configOpen}
         options={NEROptions}
         onClose={() => setConfigOpen(false)}
-        onSubmit={handleSubmit}
+        onSubmit={onSubmit}
       />
-    </>
+    </div>
   );
 };
