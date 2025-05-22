@@ -3,6 +3,7 @@ import * as Dialog from '@radix-ui/react-dialog';
 import * as Select from '@radix-ui/react-select';
 import * as Label from '@radix-ui/react-label';
 import { CaretDown } from '@phosphor-icons/react';
+import { Button } from '@recogito/studio-sdk/components';
 import { Translations } from 'src/i18n';
 
 import './ConfigDialogContent.css';
@@ -14,6 +15,7 @@ export type NERConfig = {
 }
 
 interface ConfigDialogContentProps {
+  busy: boolean;
   errorMessage: string;
   i18n: Translations;
   options: { value: string; label: string }[];
@@ -161,13 +163,14 @@ export const ConfigDialogContent = forwardRef((
           </button>
         </Dialog.Close>
         <Dialog.Close asChild>
-          <button
+          <Button
+            busy={props.busy}
             className='primary'
             disabled={!valid}
             onClick={handleSubmit}
           >
             {t['Submit']}
-          </button>
+          </Button>
         </Dialog.Close>
       </div>
     </Dialog.Content>

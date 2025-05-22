@@ -21,6 +21,7 @@ export const NERMenuExtension = forwardRef((
   const sdk = createBrowserSDK(import.meta.env);
 
   const [configOpen, setConfigOpen] = useState(false);
+  const [busy, setBusy] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
   const NEROptions: { value: string; label: string }[] = [
@@ -47,9 +48,12 @@ export const NERMenuExtension = forwardRef((
   }, []);
 
   const onSubmit = async (config: NERConfig) => {
+    setBusy(true);
+
     const { data, error } = await sdk!.supabase.auth.getSession();
 
     if (error) {
+      setBusy(false);
       setErrorMessage(error.message);
     } else {
       const token = data.session?.access_token;
@@ -69,6 +73,8 @@ export const NERMenuExtension = forwardRef((
 
       if (!res.ok)
         setErrorMessage(res.statusText);
+
+      setBusy(false);
     }
   };
 
@@ -90,6 +96,7 @@ export const NERMenuExtension = forwardRef((
         <Dialog.Overlay className="dialog-overlay dme-dialog-overlay" />
 
         <ConfigDialogContent
+          busy={busy}
           errorMessage={errorMessage}
           i18n={i18n}
           options={NEROptions}
