@@ -17,7 +17,7 @@ const NERPlugin: Plugin = {
     {
       name: "ner-document-menu-items",
 
-      component_name: "DocumentMenuExtension",
+      component_name: "NERMenuExtension",
 
       extension_point: "project:document-actions",
     },
