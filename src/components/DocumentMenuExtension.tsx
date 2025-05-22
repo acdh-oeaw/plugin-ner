@@ -7,7 +7,9 @@ import {
 import { MapPinArea } from '@phosphor-icons/react';
 import { getTranslations } from '../i18n';
 import { ErrorModal } from './ErrorModal';
-import { ConfigModal, NERConfig } from './ConfigModal';
+import { ConfigDialogContent, NERConfig } from './ConfigDialogContent';
+import * as Dropdown from '@radix-ui/react-dropdown-menu';
+import * as Dialog from '@radix-ui/react-dialog';
 
 import './DocumentMenuExtension.css';
 
@@ -20,6 +22,7 @@ export const DocumentMenuExtension = (
 
   const [errorOpen, setErrorOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+
   const [configOpen, setConfigOpen] = useState(false);
 
   const NEROptions: { value: string; label: string }[] = [
@@ -48,13 +51,10 @@ export const DocumentMenuExtension = (
       setErrorOpen(true);
       return;
     }
-
-    setConfigOpen(true);
   };
 
   const onSubmit = async (config: NERConfig) => {
     const { data, error } = await sdk!.supabase.auth.getSession();
-    setConfigOpen(false);
 
     if (error) {
       setErrorMessage(error.message);
@@ -82,40 +82,33 @@ export const DocumentMenuExtension = (
     }
   };
 
-  // Stops events from propagating upwards to Radix dropdown
-  const stopKeyDown = (evt: KeyboardEvent) =>
-    evt.stopPropagation();
-
-  const stopClick = (evt: MouseEvent) =>
-    evt.stopPropagation();
-
-  const stopPointerMove = (evt: PointerEvent) => 
-    evt.stopPropagation();
-
   return (
-    <div 
-      className='dme-menu-item'
-      onKeyDown={stopKeyDown}
-      onClick={stopClick}
-      onPointerMove={stopPointerMove}>
-      <button onClick={onOpenDialog}>
-        <MapPinArea size={16} color='#6f747c' /> {t['Perform NER on Document']}
-      </button>
+    <Dialog.Root 
+      open={configOpen}
+      onOpenChange={setConfigOpen}>
 
-      <ErrorModal
-        i18n={i18n}
-        open={errorOpen}
-        message={errorMessage}
-        onClose={() => setErrorOpen(false)}
-      />
+      <Dialog.Trigger asChild>
+        <Dropdown.Item
+          className='dme-menu-item dropdown-item'
+          onSelect={evt => evt.preventDefault()}>
+          <MapPinArea size={16} color='#6f747c' /> {t['Perform NER on Document']}
+        </Dropdown.Item>
+      </Dialog.Trigger> 
 
-      <ConfigModal
-        i18n={i18n}
-        open={configOpen}
-        options={NEROptions}
-        onClose={() => setConfigOpen(false)}
-        onSubmit={onSubmit}
-      />
-    </div>
+      <Dialog.Overlay className="dialog-overlay" />
+        <ConfigDialogContent
+          i18n={i18n}
+          options={NEROptions}
+          onClose={() => setConfigOpen(false)}
+          onSubmit={onSubmit}
+        />
+
+        {/* <ErrorModal
+            i18n={i18n}
+            open={errorOpen}
+            message={errorMessage}
+            onClose={() => setErrorOpen(false)}
+          /> */}
+    </Dialog.Root>
   );
 };
