@@ -169,7 +169,7 @@ export const ConfigDialogContent = forwardRef((
             disabled={!valid}
             onClick={handleSubmit}
           >
-            {t['Submit']}
+            <span>{t['Submit']}</span>
           </Button>
         </Dialog.Close>
       </div>
