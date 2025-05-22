@@ -142,8 +142,15 @@ const CoreNLPUrlDE =
 
 export const doStanfordNlp = task({
   id: 'do-nlp-ner',
-  run: async (payload: { data: string; language: 'en' | 'de' }, { ctx }) => {
-    const { data, language } = payload;
+  run: async (
+    payload: {
+      data: string;
+      language: 'en' | 'de';
+      outputLanguage: 'en' | 'de';
+    },
+    { ctx }
+  ) => {
+    const { data, language, outputLanguage } = payload;
 
     const url = language === 'en' ? CoreNLPUrlEN : CoreNLPUrlDE; // Default CoreNLP server URL
     const params = new URLSearchParams({
@@ -175,7 +182,7 @@ export const doStanfordNlp = task({
               text: mention.text,
               startIndex: mention.characterOffsetBegin,
               endIndex: mention.characterOffsetEnd,
-              localizedTag: map.localized[payload.language],
+              localizedTag: map.localized[outputLanguage],
               inlineTag: map.tag,
               attributes: map.attributes,
             });

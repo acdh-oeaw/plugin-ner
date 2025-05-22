@@ -46,6 +46,7 @@ export const PUT: APIRoute = async ({ request, params, cookies }) => {
       key: supabaseAPIKey,
       serverURL: supabaseServerUrl,
       nameOut: body.nameOut,
+      outputLanguage: body.outputLanguage,
     });
   }
 

@@ -16,6 +16,7 @@ export const stanfordCore = task({
     documentId: string;
     nameOut: string;
     language: 'en' | 'de';
+    outputLanguage: 'en' | 'de';
     key: string;
     token: string;
   }) => {
@@ -82,7 +83,11 @@ export const stanfordCore = task({
 
       logger.info('Calling NLP NER');
       const { ner } = await doStanfordNlp
-        .triggerAndWait({ data: text, language: payload.language })
+        .triggerAndWait({
+          data: text,
+          language: payload.language,
+          outputLanguage: payload.outputLanguage,
+        })
         .unwrap();
 
       const { tei } = await nerToXML
