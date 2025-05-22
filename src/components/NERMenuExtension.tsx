@@ -1,4 +1,4 @@
-import { useState, KeyboardEvent, MouseEvent, PointerEvent } from 'react';
+import { forwardRef, Ref, useState } from 'react';
 import {
   DocumentCardActionsExtensionProps,
   createBrowserSDK,
@@ -13,15 +13,16 @@ import * as Dialog from '@radix-ui/react-dialog';
 
 import './NERMenuExtension.css';
 
-export const DocumentMenuExtension = (
-  props: DocumentCardActionsExtensionProps
+export const NERMenuExtension = forwardRef((
+  props: DocumentCardActionsExtensionProps,
+  forwardedRef: Ref<HTMLDivElement>
 ) => {
   const i18n = getTranslations(window.location.href, 'all');
   const { t } = i18n;
   const sdk = createBrowserSDK(import.meta.env);
 
-  const [errorOpen, setErrorOpen] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
+  // const [errorOpen, setErrorOpen] = useState(false);
+  // const [errorMessage, setErrorMessage] = useState('');
 
   const [configOpen, setConfigOpen] = useState(false);
 
@@ -29,6 +30,7 @@ export const DocumentMenuExtension = (
     { value: 'stanford-core', label: t['Stanford Core NLP'] },
   ];
 
+  /*
   const onOpenDialog = async (evt: any) => {    
     const result = await sdk!.documents.get(props.document.id);
 
@@ -52,13 +54,14 @@ export const DocumentMenuExtension = (
       return;
     }
   };
+  */
 
   const onSubmit = async (config: NERConfig) => {
     const { data, error } = await sdk!.supabase.auth.getSession();
 
     if (error) {
-      setErrorMessage(error.message);
-      setErrorOpen(true);
+      // setErrorMessage(error.message);
+      // setErrorOpen(true);
     } else {
       const token = data.session?.access_token;
 
@@ -76,8 +79,8 @@ export const DocumentMenuExtension = (
       );
 
       if (!res.ok) {
-        setErrorMessage(res.statusText);
-        setErrorOpen(true);
+        // setErrorMessage(res.statusText);
+        // setErrorOpen(true);
       }
     }
   };
@@ -89,13 +92,16 @@ export const DocumentMenuExtension = (
 
       <Dialog.Trigger asChild>
         <Dropdown.Item
+          ref={forwardedRef}
           className='dme-menu-item dropdown-item'
           onSelect={evt => evt.preventDefault()}>
           <MapPinArea size={16} color='#6f747c' /> {t['Perform NER on Document']}
         </Dropdown.Item>
       </Dialog.Trigger> 
 
-      <Dialog.Overlay className="dialog-overlay" />
+      <Dialog.Portal>
+        <Dialog.Overlay className="dialog-overlay dme-dialog-overlay" />
+
         <ConfigDialogContent
           i18n={i18n}
           options={NEROptions}
@@ -109,6 +115,8 @@ export const DocumentMenuExtension = (
             message={errorMessage}
             onClose={() => setErrorOpen(false)}
           /> */}
+      </Dialog.Portal>
     </Dialog.Root>
   );
-};
+});
+

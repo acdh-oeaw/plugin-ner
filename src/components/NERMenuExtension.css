@@ -12,3 +12,7 @@
 .dme-menu-item > button:hover {
   box-shadow: none;
 }
+
+.dme-dialog-overlay {
+  z-index: 9999;
+}

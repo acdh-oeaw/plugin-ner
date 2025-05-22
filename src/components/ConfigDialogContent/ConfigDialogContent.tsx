@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { forwardRef, Ref, useState } from 'react';
 import * as Dialog from '@radix-ui/react-dialog';
 import * as Select from '@radix-ui/react-select';
 import * as Label from '@radix-ui/react-label';
@@ -20,7 +20,10 @@ interface ConfigDialogContentProps {
   onSubmit(config: NERConfig): void;
 }
 
-export const ConfigDialogContent = (props: ConfigDialogContentProps) => {
+export const ConfigDialogContent = forwardRef((
+  props: ConfigDialogContentProps,
+  forwardedRef: Ref<HTMLDivElement>
+) => {
   const { t } = props.i18n;
 
   const [language, setLanguage] = useState<'en' | 'de'>('en');
@@ -40,7 +43,11 @@ export const ConfigDialogContent = (props: ConfigDialogContentProps) => {
   const valid = language.length > 0 && model.length > 0 && nameOut.length > 0;
 
   return (
-    <Dialog.Content className='dialog-content'>
+    <Dialog.Content 
+      ref={forwardedRef}
+      className='dialog-content' 
+      onKeyDown={evt => evt.stopPropagation()}
+      onClick={evt => evt.stopPropagation()}>
       <Dialog.Title className='dialog-title'>
         {t['Configure NLP Model']}
       </Dialog.Title>
@@ -131,12 +138,7 @@ export const ConfigDialogContent = (props: ConfigDialogContentProps) => {
         <Dialog.Close asChild>
           <button
             className='outline'
-            onClick={(evt: any) => {
-              evt.preventDefault();
-              evt.stopPropagation();
-              
-            }}
-          >
+            >
             {t['Cancel']}
           </button>
         </Dialog.Close>
@@ -152,4 +154,4 @@ export const ConfigDialogContent = (props: ConfigDialogContentProps) => {
       </div>
     </Dialog.Content>
   );
-};
+});

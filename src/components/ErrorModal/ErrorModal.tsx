@@ -14,7 +14,7 @@ export const ErrorModal = (props: ErrorModalProps) => {
 
   return (
     <Dialog.Root open={props.open}>
-      <Dialog.Overlay className='dialog-overlay' />
+      <Dialog.Overlay className='dialog-overlay dme-error-overlay' />
       
       <Dialog.Portal>
         <Dialog.Overlay className='dialog-overlay' />
