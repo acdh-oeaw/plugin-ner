@@ -11,7 +11,7 @@ import { ConfigDialogContent, NERConfig } from './ConfigDialogContent';
 import * as Dropdown from '@radix-ui/react-dropdown-menu';
 import * as Dialog from '@radix-ui/react-dialog';
 
-import './DocumentMenuExtension.css';
+import './NERMenuExtension.css';
 
 export const DocumentMenuExtension = (
   props: DocumentCardActionsExtensionProps
