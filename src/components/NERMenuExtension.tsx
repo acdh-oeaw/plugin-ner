@@ -1,4 +1,4 @@
-import { forwardRef, Ref, useState } from 'react';
+import { forwardRef, Ref, useEffect, useState } from 'react';
 import {
   DocumentCardActionsExtensionProps,
   createBrowserSDK,
@@ -6,7 +6,6 @@ import {
 } from '@recogito/studio-sdk';
 import { MapPinArea } from '@phosphor-icons/react';
 import { getTranslations } from '../i18n';
-import { ErrorModal } from './ErrorModal';
 import { ConfigDialogContent, NERConfig } from './ConfigDialogContent';
 import * as Dropdown from '@radix-ui/react-dropdown-menu';
 import * as Dialog from '@radix-ui/react-dialog';
@@ -21,47 +20,37 @@ export const NERMenuExtension = forwardRef((
   const { t } = i18n;
   const sdk = createBrowserSDK(import.meta.env);
 
-  // const [errorOpen, setErrorOpen] = useState(false);
-  // const [errorMessage, setErrorMessage] = useState('');
-
   const [configOpen, setConfigOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
   const NEROptions: { value: string; label: string }[] = [
     { value: 'stanford-core', label: t['Stanford Core NLP'] },
   ];
 
-  /*
-  const onOpenDialog = async (evt: any) => {    
-    const result = await sdk!.documents.get(props.document.id);
+  useEffect(() => {
+    if (!sdk) return;
 
-    if (result.error) {
-      console.log('Failed to retrieve document!');
-      return;
-    }
+    sdk.documents.get(props.document.id).then(async result => {
+      if (result.error) {
+        setErrorMessage('Failed to retrieve document!');
+      }
 
-    const document: Document = result.data;
+      const document: Document = result.data;
 
-    const { error, data } = await sdk!.profile.getMyProfile();
-    if (error) {
-      console.error('Failed to retrieve UserProfile');
-    }
+      const { error, data } = await sdk.profile.getMyProfile();
+      if (error)
+        setErrorMessage('Failed to retrieve UserProfile');
 
-    const { id } = data;
-
-    if (document.is_private && document.created_by !== id) {
-      setErrorMessage(t['_private_document_message_']);
-      setErrorOpen(true);
-      return;
-    }
-  };
-  */
+      if (document.is_private && document.created_by !== data.id)
+        setErrorMessage(t['_private_document_message_']);
+    });
+  }, []);
 
   const onSubmit = async (config: NERConfig) => {
     const { data, error } = await sdk!.supabase.auth.getSession();
 
     if (error) {
-      // setErrorMessage(error.message);
-      // setErrorOpen(true);
+      setErrorMessage(error.message);
     } else {
       const token = data.session?.access_token;
 
@@ -78,10 +67,8 @@ export const NERMenuExtension = forwardRef((
         }
       );
 
-      if (!res.ok) {
-        // setErrorMessage(res.statusText);
-        // setErrorOpen(true);
-      }
+      if (!res.ok)
+        setErrorMessage(res.statusText);
     }
   };
 
@@ -103,18 +90,12 @@ export const NERMenuExtension = forwardRef((
         <Dialog.Overlay className="dialog-overlay dme-dialog-overlay" />
 
         <ConfigDialogContent
+          errorMessage={errorMessage}
           i18n={i18n}
           options={NEROptions}
           onClose={() => setConfigOpen(false)}
           onSubmit={onSubmit}
         />
-
-        {/* <ErrorModal
-            i18n={i18n}
-            open={errorOpen}
-            message={errorMessage}
-            onClose={() => setErrorOpen(false)}
-          /> */}
       </Dialog.Portal>
     </Dialog.Root>
   );
