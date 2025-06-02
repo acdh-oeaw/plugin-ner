@@ -1,5 +1,6 @@
 import { task, logger } from '@trigger.dev/sdk/v3';
 import type { NERResults, TagTypes } from '../types';
+import { off } from 'process';
 
 /*
 DATE, TIME, DURATION, SET, MONEY, NUMBER, ORDINAL, PERCENT, PERSON, LOCATION, ORGANIZATION, MISC, CAUSE_OF_DEATH, CITY, COUNTRY, CRIMINAL_CHARGE, EMAIL, IDEOLOGY, NATIONALITY, RELIGION, STATE_OR_PROVINCE, TITLE, URL
@@ -140,6 +141,8 @@ const CoreNLPUrlDE =
   import.meta.env.CORENLP_URL_DE ||
   'http://localhost:9000';
 
+const MAX_LENGTH = 5000;
+
 export const doStanfordNlp = task({
   id: 'do-nlp-ner',
   run: async (
@@ -152,47 +155,83 @@ export const doStanfordNlp = task({
   ) => {
     const { data, language, outputLanguage } = payload;
 
-    const url = language === 'en' ? CoreNLPUrlEN : CoreNLPUrlDE; // Default CoreNLP server URL
+    const smartChunk = (str: string) => {
+      const chunks = [];
+      const iters = Math.ceil(str.length / MAX_LENGTH);
+
+      // We need to be sure we break up strings on spaces
+      let offset = 0;
+      for (let i = 0; i < iters; i++) {
+        let chunk = str.substring(offset, offset + MAX_LENGTH);
+
+        // Find the next space
+        const idx = str.indexOf(' ', offset + MAX_LENGTH);
+
+        if (idx === -1 && i === iters - 1) {
+          chunks.push(chunk);
+        } else {
+          chunks.push(str.substring(offset, idx));
+          offset = idx + 1;
+        }
+      }
+
+      return chunks;
+    };
+
+    const url = language === 'en' ? CoreNLPUrlEN : CoreNLPUrlDE;
     const params = new URLSearchParams({
       properties: JSON.stringify({
         annotators: 'ner',
         outputFormat: 'json',
       }),
     });
-    const resp = await fetch(`${url}/?${params}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'text/plain; charset=UTF-8',
-      },
-      body: data,
-    });
 
+    const chunks = smartChunk(data);
+
+    let offset = 0;
     let ret: NERResults = { entries: [] };
-    if (resp.ok) {
-      const out: Root = await resp.json();
 
-      for (let i = 0; i < out.sentences.length; i++) {
-        const sentence = out.sentences[i];
+    for (let i = 0; i < chunks.length; i++) {
+      const chunk = chunks[i];
 
-        for (let j = 0; j < sentence.entitymentions.length; j++) {
-          const mention = sentence.entitymentions[j];
-          const map = entityMapping[mention.ner];
-          if (map) {
-            ret.entries.push({
-              text: mention.text,
-              startIndex: mention.characterOffsetBegin,
-              endIndex: mention.characterOffsetEnd,
-              localizedTag: map.localized[outputLanguage],
-              inlineTag: map.tag,
-              attributes: map.attributes,
-            });
+      logger.info(`Sending part ${i + 1} of ${chunks.length}`);
+      const resp = await fetch(`${url}/?${params}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'text/plain; charset=UTF-8',
+        },
+        body: chunk,
+      });
+
+      if (resp.ok) {
+        const out: Root = await resp.json();
+
+        for (let i = 0; i < out.sentences.length; i++) {
+          const sentence = out.sentences[i];
+
+          for (let j = 0; j < sentence.entitymentions.length; j++) {
+            const mention = sentence.entitymentions[j];
+            const map = entityMapping[mention.ner];
+            if (map) {
+              ret.entries.push({
+                text: mention.text,
+                startIndex: mention.characterOffsetBegin + offset,
+                endIndex: mention.characterOffsetEnd + offset,
+                localizedTag: map.localized[outputLanguage],
+                inlineTag: map.tag,
+                attributes: map.attributes,
+              });
+            }
           }
         }
+
+        offset += chunk.length + 1; // Account for the last space
+      } else {
+        logger.error(resp.statusText);
+        throw new Error(resp.statusText);
       }
-      return { ner: ret };
-    } else {
-      logger.error(resp.statusText);
-      throw new Error(resp.statusText);
     }
+
+    return { ner: ret };
   },
 });

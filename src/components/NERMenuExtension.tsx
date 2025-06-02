@@ -29,6 +29,10 @@ export const NERMenuExtension = forwardRef(
       { value: 'stanford-core', label: t['Stanford Core NLP'] },
     ];
 
+    const enabled =
+      props.document.content_type === 'text/xml' ||
+      props.document.content_type === 'text/plain';
+
     useEffect(() => {
       if (!sdk) return;
 
@@ -90,6 +94,7 @@ export const NERMenuExtension = forwardRef(
             ref={forwardedRef}
             className='dme-menu-item dropdown-item'
             onSelect={(evt) => evt.preventDefault()}
+            disabled={!enabled}
           >
             <MapPinArea size={16} color='#6f747c' />{' '}
             {t['Perform NER on Document']}
