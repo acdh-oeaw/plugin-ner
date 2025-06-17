@@ -8,6 +8,21 @@ import { createClient } from '@supabase/supabase-js';
 import { Document } from '@recogito/studio-sdk';
 import { xmlToPlainText } from './tasks/xmlToPlainText';
 
+const translations = (docName: string) => ({
+  success: {
+    en: `Your document, ${docName}, has successfully been processed through NER and is now available in your project`,
+    de: `Your document, ${docName}, has successfully been processed through NER and is now available in your project`,
+  },
+  failure: {
+    en: `There was an error creating your document, ${docName}.`,
+    de: `There was an error creating your document, ${docName}.`,
+  },
+  goto: {
+    en: 'Go to your project',
+    de: 'Go to your project',
+  },
+});
+
 export const stanfordCore = task({
   id: 'stanford-core',
   run: async (payload: {
@@ -19,6 +34,7 @@ export const stanfordCore = task({
     outputLanguage: 'en' | 'de';
     key: string;
     token: string;
+    userId: string;
   }) => {
     logger.info('Creating Supabase client');
     const supabase = createClient(payload.serverURL, payload.key, {
@@ -109,6 +125,14 @@ export const stanfordCore = task({
           key: payload.key,
           token: payload.token,
           supabaseURL: payload.serverURL,
+          userId: payload.userId,
+          language: payload.outputLanguage,
+          successMessage: translations(payload.nameOut).success[
+            payload.outputLanguage
+          ],
+          gotoMessage: translations(payload.nameOut).goto[
+            payload.outputLanguage
+          ],
         })
         .unwrap();
 
@@ -116,5 +140,29 @@ export const stanfordCore = task({
         throw new Error('Failed to upload document');
       }
     }
+  },
+  handleError: async (payload, error, { ctx, retryAt }) => {
+    logger.info('Sending error notification');
+
+    logger.info('Creating Supabase client');
+    const supabase = createClient(payload.serverURL, payload.key, {
+      global: {
+        headers: {
+          Authorization: `Bearer ${payload.token}`,
+        },
+      },
+    });
+    await supabase
+      .from('notifications')
+      .insert({
+        target_user_id: payload.userId,
+        message: translations(payload.nameOut).failure[payload.outputLanguage],
+        message_type: 'ERROR',
+      })
+      .select();
+
+    return {
+      skipRetrying: true,
+    };
   },
 });
