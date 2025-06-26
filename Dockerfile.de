@@ -33,7 +33,7 @@ ADD test_api.py .
 
 ENV JAVA_XMX 4g
 ENV ANNOTATORS tokenize,ssplit,pos,lemma,ner,depparse,coref,natlog,openie,parse
-ENV TIMEOUT_MILLISECONDS 15000
+ENV TIMEOUT_MILLISECONDS 600000
 
 ENV PORT 9000
 

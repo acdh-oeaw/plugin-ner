@@ -14,8 +14,8 @@ services:
         max-file: '3'
     environment:
       - JAVA_XMX=6g
-      - CORENLP_TIMEOUT=60000
-      - TIMEOUT_MILLISECONDS=60000
+      - CORENLP_TIMEOUT=600000
+      - TIMEOUT_MILLISECONDS=600000
 
   corenlp-de:
     build:
@@ -30,5 +30,5 @@ services:
         max-file: '3'
     environment:
       - JAVA_XMX=6g
-      - CORENLP_TIMEOUT=60000
-      - TIMEOUT_MILLISECONDS=60000
+      - CORENLP_TIMEOUT=600000
+      - TIMEOUT_MILLISECONDS=600000

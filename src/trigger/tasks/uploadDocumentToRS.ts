@@ -1,4 +1,4 @@
-import { SupabaseClient, createClient } from '@supabase/supabase-js';
+import { createClient } from '@supabase/supabase-js';
 import { task, logger } from '@trigger.dev/sdk/v3';
 import * as tus from 'tus-js-client';
 
@@ -15,6 +15,10 @@ export const uploadDocumentToRS = task({
       key: string;
       token: string;
       supabaseURL: string;
+      userId: string;
+      language: string;
+      successMessage: string;
+      gotoMessage: string;
     },
     { ctx }
   ) => {
@@ -27,6 +31,10 @@ export const uploadDocumentToRS = task({
       projectId,
       documentId,
       supabaseURL,
+      userId,
+      successMessage,
+      gotoMessage,
+      language,
     } = payload;
 
     const uploadFile = async (
@@ -132,6 +140,24 @@ export const uploadDocumentToRS = task({
       if (addResult.error) {
         logger.error(addResult.error.message);
         throw new Error(addResult.error.message);
+      }
+
+      logger.info('Sending notification');
+
+      const notifyResp = await supabase
+        .from('notifications')
+        .insert({
+          target_user_id: userId,
+          message: successMessage,
+          action_url: `/${language}/projects/${projectId}`,
+          action_message: gotoMessage,
+          message_type: 'INFO',
+        })
+        .select();
+
+      if (notifyResp.error) {
+        logger.error(notifyResp.error.message);
+        throw new Error(notifyResp.error.message);
       }
 
       return true;
