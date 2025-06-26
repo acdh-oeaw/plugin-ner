@@ -13,6 +13,8 @@ const NERPlugin: Plugin = {
 
   homepage: "https://www.performantsoftware.com/",
 
+  thumbnail: 'thumbnail.jpg',
+
   extensions: [
     {
       name: "ner-document-menu-items",

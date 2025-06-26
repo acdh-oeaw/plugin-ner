@@ -18,6 +18,7 @@
   },
   "exports": {
     ".": "./dist/index.js",
+    "./thumbnail.jpg": "./dist/assets/thumbnail.jpg",
     "./NERMenuExtension": "./dist/components/NERMenuExtension.js",
     "./NERAgentRoute.ts": "./dist/api/NERAgentRoute.js"
   },
