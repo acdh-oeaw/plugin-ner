@@ -141,28 +141,4 @@ export const stanfordCore = task({
       }
     }
   },
-  handleError: async (payload, error, { ctx, retryAt }) => {
-    logger.info('Sending error notification');
-
-    logger.info('Creating Supabase client');
-    const supabase = createClient(payload.serverURL, payload.key, {
-      global: {
-        headers: {
-          Authorization: `Bearer ${payload.token}`,
-        },
-      },
-    });
-    await supabase
-      .from('notifications')
-      .insert({
-        target_user_id: payload.userId,
-        message: translations(payload.nameOut).failure[payload.outputLanguage],
-        message_type: 'ERROR',
-      })
-      .select();
-
-    return {
-      skipRetrying: true,
-    };
-  },
 });
