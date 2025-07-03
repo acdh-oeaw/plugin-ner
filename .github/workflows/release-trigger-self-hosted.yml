@@ -8,6 +8,9 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    # ✅ Add permissions here at the job level
+    permissions:
+      packages: write
 
     steps:
       - uses: actions/checkout@v4
@@ -38,11 +41,8 @@ jobs:
           TRIGGER_SECRET_KEY: ${{ secrets.TRIGGER_SECRET_KEY }}
           TRIGGER_API_URL: ${{ vars.TRIGGER_API_URL }}
           TRIGGER_SERVER_URL: ${{ vars.TRIGGER_SERVER_URL }}
-          GHCR_USERNAME: ${{ vars.GHCR_USERNAME }}
-          GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
         run: |
           sed -i 's|proj_fyeypkhgyaejpiweobwq|proj_ojornoedwjbzoigcdkcn|g' ./src/trigger.config.ts
           sudo apt-get update && sudo apt-get install -y util-linux
           script -q -e -c "bash -c 'npx trigger.dev@v4-beta login -a $TRIGGER_SERVER_URL --profile self-hosted'"
-          script -q -e -c "bash -c 'echo $GHCR_TOKEN | docker login ghcr.io -u $GHCR_USERNAME --password-stdin'"
           echo y | script -q -e -c "bash -c 'npx trigger.dev@v4-beta deploy --env staging --profile self-hosted --push -c ./src/trigger.config.ts'"
