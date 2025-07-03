@@ -36,12 +36,11 @@ jobs:
         env:
           TRIGGER_ACCESS_TOKEN: ${{ secrets.TRIGGER_ACCESS_TOKEN }}
           # required when self-hosting
-          TRIGGER_API_URL: ${{ secrets.TRIGGER_API_URL }}
-          TRIGGER_SERVER_URL: ${{ secrets.TRIGGER_SERVER_URL }}
+          TRIGGER_API_URL: ${{ vars.TRIGGER_API_URL }}
+          TRIGGER_SERVER_URL: ${{ vars.TRIGGER_SERVER_URL }}
         run: |
           sed -i 's|proj_fyeypkhgyaejpiweobwq|proj_ojornoedwjbzoigcdkcn|g' ./src/trigger.config.ts
           sudo apt-get update && sudo apt-get install -y util-linux
-          script -q -e -c "bash -c 'npx trigger.dev@v4-beta login -a $TRIGGER_SERVER_URL --profile self-hosted'"
-          echo y | script -q -e -c "bash -c 'npx trigger.dev@v4-beta deploy --env staging --profile self-hosted --push -c ./src/trigger.config.ts'"
-
+          script -q -e -c 'npx trigger.dev@v4-beta login -a $TRIGGER_SERVER_URL --profile self-hosted'
+          echo y | script -q -e -c 'npx trigger.dev@v4-beta deploy --env staging --profile self-hosted --push -c ./src/trigger.config.ts'
 
