@@ -40,5 +40,4 @@ jobs:
           TRIGGER_SERVER_URL: ${{ secrets.TRIGGER_API_URL }}
         run: |
           sed -i 's|proj_fyeypkhgyaejpiweobwq|proj_ojornoedwjbzoigcdkcn|g' ./src/trigger.config.ts
-          npx trigger.dev@v4-beta login -a $TRIGGER_SERVER_URL --profile self-hosted
           npx trigger.dev@v4-beta deploy --env staging --profile self-hosted -c ./src/trigger.config.ts
