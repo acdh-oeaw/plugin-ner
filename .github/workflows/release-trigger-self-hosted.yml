@@ -41,5 +41,6 @@ jobs:
         run: |
           sed -i 's|proj_fyeypkhgyaejpiweobwq|proj_ojornoedwjbzoigcdkcn|g' ./src/trigger.config.ts
           sudo apt-get update && sudo apt-get install -y util-linux
-          echo y | script -q -e -c "npx trigger.dev@v4-beta deploy --env staging --profile self-hosted --push -c ./src/trigger.config.ts"
+          script -q -e -c 'npx trigger.dev@v4-beta  login -a $TRIGGER_SERVER_URL --profile self-hosted'
+          echo y | script -q -e -c 'npx trigger.dev@v4-beta deploy --env staging --profile self-hosted --push -c ./src/trigger.config.ts'
 
