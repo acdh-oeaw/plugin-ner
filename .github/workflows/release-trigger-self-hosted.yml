@@ -37,7 +37,7 @@ jobs:
           TRIGGER_ACCESS_TOKEN: ${{ secrets.TRIGGER_ACCESS_TOKEN }}
           # required when self-hosting
           TRIGGER_API_URL: ${{ secrets.TRIGGER_API_URL }}
-          TRIGGER_SERVER_URL: ${{ secrets.TRIGGER_API_URL }
+          TRIGGER_SERVER_URL: ${{ secrets.TRIGGER_API_URL }}
         run: |
           sed -i 's|proj_fyeypkhgyaejpiweobwq|proj_ojornoedwjbzoigcdkcn|g' ./src/trigger.config.ts
           npx trigger.dev@latest login -a $TRIGGER_SERVER_URL --profile self-hosted
