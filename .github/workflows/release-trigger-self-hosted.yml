@@ -32,15 +32,26 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      # optional: prepare secret for Docker BuildKit
+      - name: Prepare Trigger Secret Key
+        run: echo "${{ secrets.TRIGGER_SECRET_KEY }}" > trigger_secret_key.txt
+
+      - name: Build and push Docker image to GHCR
+        run: |
+          IMAGE_NAME=ghcr.io/${{ github.repository_owner }}/trigger/proj_ojornoedwjbzoigcdkcn
+          docker build \
+            --secret id=trigger_secret_key,src=trigger_secret_key.txt \
+            -t $IMAGE_NAME:20250703.5.stg .
+          docker push $IMAGE_NAME:20250703.5.stg
+
       - name: 🚀 Deploy Trigger.dev
         env:
           TRIGGER_ACCESS_TOKEN: ${{ secrets.TRIGGER_ACCESS_TOKEN }}
-          # required when self-hosting
+          TRIGGER_SECRET_KEY: ${{ secrets.TRIGGER_SECRET_KEY }}
           TRIGGER_API_URL: ${{ vars.TRIGGER_API_URL }}
           TRIGGER_SERVER_URL: ${{ vars.TRIGGER_SERVER_URL }}
         run: |
           sed -i 's|proj_fyeypkhgyaejpiweobwq|proj_ojornoedwjbzoigcdkcn|g' ./src/trigger.config.ts
           sudo apt-get update && sudo apt-get install -y util-linux
-          script -q -e -c 'npx trigger.dev@v4-beta login -a $TRIGGER_SERVER_URL --profile self-hosted'
-          echo y | script -q -e -c 'npx trigger.dev@v4-beta deploy --env staging --profile self-hosted --push -c ./src/trigger.config.ts'
-
+          script -q -e -c "bash -c 'npx trigger.dev@v4-beta login -a $TRIGGER_SERVER_URL --profile self-hosted'"
+          echo y | script -q -e -c "bash -c 'npx trigger.dev@v4-beta deploy --env staging --profile self-hosted --push -c ./src/trigger.config.ts'"
