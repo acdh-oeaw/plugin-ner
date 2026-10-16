@@ -25,6 +25,8 @@ const translations = (docName: string) => ({
 
 export const stanfordCore = task({
   id: 'stanford-core',
+  // Large XML/NER results exceed the default 500 MB worker memory limit.
+  machine: 'medium-1x',
   // Replaying this whole pipeline after an upload/notification failure can create
   // duplicate documents. Enable retries only after publication is idempotent.
   retry: { maxAttempts: 1 },
