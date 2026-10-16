@@ -10,6 +10,7 @@
     "src"
   ],
   "scripts": {
+    "test:transport": "npm run build && node --experimental-test-module-mocks --test test/transport.test.mjs",
     "dev": "npm start --prefix .dev/",
     "build": "rm -rf dist && tsc && npm run copy-files",
     "copy-files": "copyfiles -u 1 \"src/**/*.css\" \"src/**/*.jpg\" dist",
