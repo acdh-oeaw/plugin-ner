@@ -1,14 +1,10 @@
-import { task } from '@trigger.dev/sdk/v3';
 import type { NERResults } from '../types';
 import { parseXML } from '@recogito/standoff-converter';
 import * as uuid from 'uuid';
 
-export const nerToXML = task({
-  id: 'ner-to-xml',
-  run: async (
-    payload: { nerData: NERResults; text: string; originalXML?: string },
-    { ctx }
-  ) => {
+export const nerToXML = async (
+  payload: { nerData: NERResults; text: string; originalXML?: string }
+) => {
     const { nerData, text, originalXML } = payload;
 
     let xml: string | undefined = originalXML;
@@ -68,5 +64,4 @@ export const nerToXML = task({
 
     const tei = standoff.xmlString();
     return { tei };
-  },
-});
+};

@@ -1,9 +1,7 @@
-import { task } from '@trigger.dev/sdk/v3';
 import { parseXML } from '@recogito/standoff-converter';
 
-export const plainTextToXML = task({
-  id: 'plain-text-to-xml',
-  run: async (payload: { text: string }, { ctx }) => {
+// Keep large XML/text intermediates inside the worker, outside Trigger packets.
+export const plainTextToXML = async (payload: { text: string }) => {
     const { text } = payload;
 
     const xml = `
@@ -44,5 +42,4 @@ export const plainTextToXML = task({
     const newText = standoff.text();
 
     return { xml: newXML, text: newText };
-  },
-});
+};

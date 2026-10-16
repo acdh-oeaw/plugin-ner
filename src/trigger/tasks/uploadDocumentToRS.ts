@@ -1,10 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
-import { task, logger } from '@trigger.dev/sdk/v3';
+import { logger } from '@trigger.dev/sdk/v3';
 import * as tus from 'tus-js-client';
 
-export const uploadDocumentToRS = task({
-  id: 'upload-document-to-rs',
-  run: async (
+export const uploadDocumentToRS = async (
     payload: {
       id: string;
       documentData: string;
@@ -19,8 +17,7 @@ export const uploadDocumentToRS = task({
       language: string;
       successMessage: string;
       gotoMessage: string;
-    },
-    { ctx }
+    }
   ) => {
     const {
       documentData,
@@ -160,10 +157,9 @@ export const uploadDocumentToRS = task({
         throw new Error(notifyResp.error.message);
       }
 
-      return true;
+      return { documentId: result.data.id as string };
     } else {
       logger.error('Failed to create Supabase client');
       throw new Error('Failed to create Supabase client');
     }
-  },
-});
+};
