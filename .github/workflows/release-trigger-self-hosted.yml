@@ -22,8 +22,8 @@ jobs:
 
       - name: Upgrade Trigger.dev packages
         run: |
-          npm install @trigger.dev/sdk@4.7.3
-          npm install @trigger.dev/build@4.7.3 --save-dev
+          npm install @trigger.dev/sdk@4.7.4
+          npm install @trigger.dev/build@4.7.4 --save-dev
 
       - name: Verify Trigger versions
         run: |
@@ -50,11 +50,11 @@ jobs:
           TRIGGER_SERVER_URL: ${{ vars.TRIGGER_SERVER_URL }}
           TRIGGER_ACCESS_TOKEN: ${{ secrets.TRIGGER_ACCESS_TOKEN }}
         run: |
-          npx -y trigger.dev@4.7.3 login \
+          npx -y trigger.dev@4.7.4 login \
             -a "$TRIGGER_SERVER_URL" \
             --profile self-hosted
 
-          npx -y trigger.dev@4.7.3 deploy \
+          npx -y trigger.dev@4.7.4 deploy \
             --env staging \
             --profile self-hosted \
             --push \
