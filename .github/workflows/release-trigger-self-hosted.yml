@@ -1,34 +1,66 @@
-name: Deploy Trigger Tasks
+name: Deploy Recogito and NER Trigger Tasks
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
 
+concurrency:
+  group: recogito-trigger-staging
+  cancel-in-progress: false
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: client
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout NER source from this repository
+        uses: actions/checkout@v4
+        with:
+          path: ner-source
 
-      - name: Use Node.js 24
+      - name: Checkout official Recogito Client 1.12.0
+        uses: actions/checkout@v4
+        with:
+          repository: recogito/recogito-client
+          ref: 13bbea262f5a99367d07bb4d92d3a90ddb489b6e
+          path: client
+
+      - name: Use Node.js 26
         uses: actions/setup-node@v4
         with:
-          node-version: "24"
+          node-version: "26"
 
-      - name: Install dependencies
-        run: npm install --include=dev
+      - name: Install client dependencies
+        run: npm ci --include=dev
 
-      - name: Upgrade Trigger.dev packages
+      - name: Add NER task sources to the deployment
         run: |
-          npm install @trigger.dev/sdk@4.8.3
-          npm install @trigger.dev/build@4.8.3 --save-dev
+          test -f ../ner-source/src/trigger/stanfordCore.ts
+          mkdir -p src/trigger/ner
+          cp -R ../ner-source/src/trigger/. src/trigger/ner/
 
-      - name: Verify Trigger versions
+      - name: Install NER task dependencies and align Trigger packages
         run: |
-          npm ls @trigger.dev/sdk || true
-          npm ls @trigger.dev/build || true
+          npm install --include=dev --save-exact \
+            @recogito/standoff-converter@0.1.10 \
+            tus-js-client@4.3.1 \
+            @trigger.dev/sdk@4.8.3
+          npm install --include=dev --save-dev --save-exact \
+            @trigger.dev/build@4.8.3
+          npm ls @trigger.dev/sdk @trigger.dev/build \
+            @recogito/standoff-converter tus-js-client
+
+      - name: Verify task entry points
+        run: |
+          test -f src/trigger/runJob.ts
+          test -f src/trigger/exportProject/index.ts
+          test -f src/trigger/importProject/index.ts
+          test -f src/trigger/ner/stanfordCore.ts
 
       - name: Login to GHCR
         uses: docker/login-action@v3
@@ -40,16 +72,20 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Patch Project ID
-        run: |
-          sed -i 's|proj_fyeypkhgyaejpiweobwq|proj_detlmirwqqmzxiwbjkht|g' ./src/trigger.config.ts
-
-      - name: Deploy to Trigger.dev (Self-Hosted)
+      - name: Deploy all four tasks to Trigger.dev staging
         env:
+          TRIGGER_PROJECT_ID: proj_detlmirwqqmzxiwbjkht
           TRIGGER_API_URL: ${{ vars.TRIGGER_API_URL }}
           TRIGGER_SERVER_URL: ${{ vars.TRIGGER_SERVER_URL }}
           TRIGGER_ACCESS_TOKEN: ${{ secrets.TRIGGER_ACCESS_TOKEN }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          IIIF_KEY: ${{ secrets.IIIF_KEY }}
         run: |
+          test -n "$SUPABASE_SERVICE_KEY" || {
+            echo 'Missing GitHub secret SUPABASE_SERVICE_KEY; refusing to sync an empty value.'
+            exit 1
+          }
+
           npx -y trigger.dev@4.8.3 login \
             -a "$TRIGGER_SERVER_URL" \
             --profile self-hosted
@@ -58,4 +94,4 @@ jobs:
             --env staging \
             --profile self-hosted \
             --push \
-            -c ./src/trigger.config.ts
+            -c ./trigger.config.ts
